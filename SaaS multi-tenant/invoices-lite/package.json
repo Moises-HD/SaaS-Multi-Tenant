@@ -1,0 +1,17 @@
+{
+  "name": "invoices-lite",
+  "private": true,
+  "packageManager": "pnpm@9.6.0",
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev:api": "pnpm --filter @app/api dev",
+    "dev:web": "pnpm --filter @app/web dev",
+    "dev": "concurrently -k \"pnpm dev:api\" \"pnpm dev:web\"",
+    "build": "turbo build",
+    "lint": "turbo lint"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0",
+    "turbo": "^2.1.0"
+  }
+}

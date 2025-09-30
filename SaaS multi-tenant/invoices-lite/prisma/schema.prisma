@@ -1,0 +1,112 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  OWNER
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  VOID
+}
+
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  passwordHash  String
+  name          String?
+  memberships   Membership[]
+  refreshTokens RefreshToken[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model Tenant {
+  id          String       @id @default(cuid())
+  name        String
+  slug        String       @unique
+  memberships Membership[]
+  customers   Customer[]
+  invoices    Invoice[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Membership {
+  id       String @id @default(cuid())
+  userId   String
+  tenantId String
+  role     Role
+  user     User   @relation(fields: [userId], references: [id])
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  @@unique([userId, tenantId])
+}
+
+model Customer {
+  id        String    @id @default(cuid())
+  tenantId  String
+  name      String
+  email     String?
+  tenant    Tenant    @relation(fields: [tenantId], references: [id])
+  invoices  Invoice[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Invoice {
+  id         String        @id @default(cuid())
+  tenantId   String
+  customerId String
+  number     String
+  amount     Int
+  currency   String        @default("EUR")
+  issueDate  DateTime
+  dueDate    DateTime?
+  status     InvoiceStatus @default(DRAFT)
+  tenant     Tenant        @relation(fields: [tenantId], references: [id])
+  customer   Customer      @relation(fields: [customerId], references: [id])
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  @@unique([tenantId, number])
+  @@index([tenantId])
+}
+
+model RefreshToken {
+  id                String    @id @default(cuid())
+  userId            String
+  hashedToken       String
+  isValid           Boolean   @default(true)
+  expiresAt         DateTime
+  replacedByTokenId String?
+  revokedAt         DateTime?
+  user              User      @relation(fields: [userId], references: [id])
+  createdAt         DateTime  @default(now())
+
+  @@index([userId, isValid])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  tenantId  String?
+  userId    String?
+  action    String
+  ip        String?
+  userAgent String?
+  payload   Json?
+  createdAt DateTime @default(now())
+
+  @@index([tenantId, createdAt])
+}

@@ -1,0 +1,17 @@
+# node/yarn/pnpm
+node_modules
+**/node_modules
+
+# Next builds
+**/.next
+out
+
+# Env files (no secrets en el repo)
+.env
+.env.*
+**/.env
+**/.env.*
+
+# usar pnpm, evita otros lockfiles
+package-lock.json
+yarn.lock
