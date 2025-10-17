@@ -202,6 +202,6 @@ Contacta por GitHub o email para soporte y colaboraciones.
 
 ---
 
-## 📦 Licencia
+## 🧾 **Licencia:** [MIT](./LICENSE)
 
 Código bajo licencia **MIT**. Úsalo en proyectos educativos o profesionales con la atribución correspondiente.
